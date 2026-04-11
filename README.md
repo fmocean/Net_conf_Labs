@@ -34,9 +34,7 @@ You start from basic interface/loopback configs and layer on OSPF, BGP, tunnelin
   - Prefix‑lists and route‑maps for filtering and tagging.
   - Transit‑AS blocking and route dampening.
 
-## Why it’s useful
-
-By finishing this lab you practice how to:
+Main Tasks:
 
 - Design and configure a **realistic ISP/customer edge**, not just a single eBGP peering.
 - Use **communities and attributes** to decide who sees which prefixes and over which path.
