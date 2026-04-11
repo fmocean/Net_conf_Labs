@@ -1,0 +1,104 @@
+
+BGP Professional Lab 1 – govNet Edge
+This lab builds a mini service-provider network called govNet that connects to an ISP and several internal regions. It’s designed to feel like a real deployment, not a toy.
+
+Topology at a glance
+10 routers total
+
+ISP router in AS 999
+
+govNet edge R1 in AS 1
+
+Regional AS 23: R2, R3
+
+Large regional confederation AS 4567:
+
+Sub‑AS 45: R4, R5
+
+Sub‑AS 67: R6, R7
+
+Transit box R8 (no BGP) between R5 and R9
+
+External customer R9 with a 4‑byte ASN
+
+Mix of:
+
+IPv4 + IPv6
+
+iBGP, eBGP, confederations
+
+GRE tunnel (R5–R9 via R8)
+
+What problems this lab simulates
+Internet edge for a government network
+govNet (AS 1) connects to a Tier‑1 ISP and multiple internal ASes, just like a national network serving schools, hospitals, etc.
+
+Multi‑AS / multi‑region design
+AS 23 and confed AS 4567 model independent regions or operators that must still act as one logical backbone.
+
+Controlled route propagation
+Some prefixes should:
+
+Stay internal only (no‑advertise)
+
+Reach partners but not leak to the global Internet (no‑export)
+
+Be visible only in part of the confederation (private communities)
+
+Gradual IPv6 deployment
+IPv6 is enabled on the ISP link and carried into AS 23 over existing IPv4 sessions, while other parts of the network stay IPv4‑only.
+
+Redundancy and load‑sharing
+R1 sees multiple paths (via R2 and R3) to shared prefixes and uses BGP multipath to spread traffic and survive failures.
+
+Key technologies you configure
+BGP basics
+
+eBGP with ISP and customers
+
+iBGP and loopbacks as router‑IDs
+
+BGP confederation for AS 4567
+
+Traffic engineering
+
+Weight, local‑preference, MED
+
+AS‑path prepending
+
+Prefix summarization on the ISP side
+
+Policy control
+
+Communities: no-advertise, no-export, and custom communities (e.g., “only sub‑AS 45”)
+
+Prefix‑lists + route‑maps for filtering and tagging
+
+Transit‑AS blocking for specific prefixes
+
+Route dampening for unstable routes
+
+IPv6
+
+Dual‑stack edge with the ISP
+
+IPv6 over existing IPv4 BGP sessions to AS 23
+
+Resilience / scaling features
+
+BGP peer‑groups for cleaner configs
+
+Multipath for equal‑cost routes
+
+Soft reconfig / next‑hop‑self / next‑hop tracking
+
+What you should be able to do after
+By the end, you should comfortably:
+
+Design a clean BGP edge between an ISP and a multi‑AS customer network.
+
+Use communities and attributes to decide exactly who sees which prefixes and via which path.
+
+Bring up IPv6 alongside IPv4 without rebuilding the whole network.
+
+Read and write production‑style BGP configs that are modular, scalable, and debug‑friendly.

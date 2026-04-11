@@ -1,0 +1,73 @@
+1. Bring-up and IGP
+Paste the base startup config on ISP, R1–R9 and save.
+
+Configure OSPF in AS 23 (R2, R3) so loopbacks and 192.168.23.0/24 are reachable.
+
+Configure OSPF in AS 4567 (R4–R7) for loopbacks and links 45/46/57/67.
+
+2. Tunnel & reachability
+Add two static routes on R5, R9 plus two on R8 (as allowed) so they can reach each other’s tunnel endpoints.
+
+Build a GRE tunnel between R5 and R9 and verify pings between 5.5.5.5 and 9.9.9.9.
+
+3. BGP fundamentals
+Configure all iBGP sessions with loopbacks in AS 23 and confed AS 4567.
+
+Configure all required eBGP sessions exactly as in the topology (ISP↔R1, R1↔R2/R3/R4, R2↔R4, R3↔R5, R5↔R9, etc.).
+
+Make R5–R9 eBGP work using loopbacks + ebgp-multihop and 4‑byte ASN.
+
+Enable IPv6 eBGP between ISP and R1 and advertise ISP IPv6 loopback prefixes.
+
+4. Route advertisement
+On ISP, redistribute connected + network for Loopback0 in IPv4 AF.
+
+Advertise all ISP IPv6 loopback prefixes with network under IPv6 AF.
+
+Ensure AS 23 receives IPv6 over IPv4 sessions with R1 (IPv6 AF on IPv4 neighbors).
+
+Advertise all BGP routers’ Loopback0 IPv4 /32 using network.
+
+Apply next-hop self where needed so traffic can actually leave each AS.
+
+5. Advanced policy / TE
+Enable auto-summary on R9 for the 9.0.0.0/8 future expansion.
+
+Summarize ISP loopbacks 10–12 into a single prefix and suppress specifics.
+
+Use weight on R4 so 12.34.0.0/16 prefers going via AS 23 instead of direct to AS 1.
+
+Use local-pref in AS 23 so 23.45.0.0/16 always exits via R2.
+
+Use AS-path prepending on R4 so R1 prefers path to R9 via AS 23 over AS 4567.
+
+Change origin for 66.77.0.0/17 on ISP to look like a “normal network” (not via redistribution).
+
+Set MED on R3 so within AS 23, the path via R2 is preferred for R9’s loopback.
+
+6. Communities & filtering
+On R1, tag 102.64.0.0/18 with no-advertise so R2/R3/R4 don’t pass it on.
+
+On R1, tag 123.45.0.0/17 with no-export so AS 23/4567 don’t leak it to their eBGP peers.
+
+On R1, tag 130.25.0.0/18 with a private community so only sub‑AS 45 uses it.
+
+On R5, use prefix‑lists to block all /18 routes from reaching R9.
+
+On R9, use prefix‑list / extended filter to block any /22–/32 prefixes.
+
+Use distribute-list in AS 23 so it’s never a transit AS for 175.45.200.0/21.
+
+Add AS-path filters so R6 drops any routes that have passed through AS 23, and R3 removes paths that traversed AS 4567 but keeps those originated there.
+
+7. Stability & scaling features
+Enable route dampening on R2 for ISP loopbacks 13–15 with the given timers.
+
+Configure peer-groups on R1 for AS 23 neighbors.
+
+Enable soft reconfig inbound on R6/R7 for their inter-sub‑AS sessions.
+
+Enable BGP multipath on R1 so both R2 and R3 are best paths to 192.168.23.0/24 (max 2).
+
+Enable next-hop tracking on R2 and tune the trigger delay to 10 seconds (IPv4 AF).
+

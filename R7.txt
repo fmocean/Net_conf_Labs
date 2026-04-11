@@ -1,0 +1,13 @@
+hostname R7
+ip cef
+!
+interface Loopback0
+ ip address 7.7.7.7 255.255.255.255
+!
+interface GigabitEthernet0/0
+ ip address 192.168.57.7 255.255.255.0
+!
+interface GigabitEthernet0/1
+ ip address 192.168.67.7 255.255.255.0
+!
+end
