@@ -25,77 +25,149 @@ It runs a short suite of TCP and UDP tests, shows a live spinner while each test
 
 ## Requirements
 
-### Both sides (testing net & target net)
+## Installation
 
-- Linux/Unix shell with:
-  - `bash`
-  - `iperf3`
-  - `ping`
-  - `timeout`
-  - `awk`, `grep`, `tail`
-- Basic IP connectivity between testing net and target net.
+`quick_live_iperf` assumes **iperf3** is installed on both the **testing net** host (client) and the **target net** host (server). [web:172][web:209]
 
-### Target net (iperf3 server)
+### Install iperf3 on Linux
 
-On the **target** host:
+On most modern Linux distros iperf3 is in the default repos: [web:172][web:211]
 
-1. Install `iperf3`:
+```bash
+# Debian / Ubuntu / Mint
+sudo apt update
+sudo apt install iperf3
 
-   ```bash
-   # Ubuntu / Debian
-   sudo apt update
-   sudo apt install iperf3
+# RHEL / CentOS / Rocky / AlmaLinux
+sudo yum install iperf3        # or:
+sudo dnf install iperf3
 
-   # RHEL / CentOS / Fedora
-   sudo dnf install iperf3
-   ```
+# Fedora
+sudo dnf install iperf3
 
-2. Start iperf3 server (default port 5201):
+# Arch Linux
+sudo pacman -S iperf3
+
+# openSUSE
+sudo zypper install iperf3
+```
+
+### Install iperf3 on macOS
+
+On macOS, use Homebrew or MacPorts: [web:208][web:212]
+
+```bash
+# Homebrew
+brew install iperf3
+
+# MacPorts
+sudo port install iperf3
+```
+
+### Install iperf3 on Windows
+
+On Windows, download prebuilt binaries from the official iperf site: [web:208]
+
+1. Go to: https://iperf.fr/iperf-download.php  
+2. Download the latest **iperf3 Windows binary** (64‑bit recommended).  
+3. Extract the archive and either:
+   - Run `iperf3.exe` from that folder, or
+   - Add the folder to your `PATH` so `iperf3` is available in any CMD/PowerShell window.
+
+> Note: `quick_live_iperf.sh` itself is a Bash script, so you’ll typically run it on a Linux/macOS client. The Windows side can act as the iperf3 **server** or **client** as long as the port and firewall are configured.
+
+---
+
+## Setup: Target net (iperf3 server)
+
+On the **target** host (server side):
+
+1. **Install iperf3** using the commands above for your OS. [web:172][web:211]
+
+2. **Start iperf3 server**
+
+   Default port 5201:
 
    ```bash
    iperf3 -s
    ```
 
-   To use a custom port (example: 9000):
+   Custom port (example: 9000):
 
    ```bash
    iperf3 -s -p 9000
    ```
 
-3. Open firewall and/or NAT for the iperf3 port:
+3. **Open firewall / NAT for the iperf3 port**
+
+   Examples for port 5201 (adjust if you use a different port): [web:22][web:174]
 
    ```bash
-   # ufw example (5201)
+   # ufw (Ubuntu)
    sudo ufw allow 5201/tcp
    sudo ufw allow 5201/udp
 
-   # firewalld example (5201)
+   # firewalld (RHEL/Fedora)
    sudo firewall-cmd --add-port=5201/tcp --permanent
    sudo firewall-cmd --add-port=5201/udp --permanent
    sudo firewall-cmd --reload
    ```
 
-   If you use a different port, adjust the rules accordingly.
+   On home/edge routers, add a **port‑forward** for TCP/UDP 5201 (or your chosen port) to the target host if testing across NAT.
 
-You can also run iperf3 as a service or daemon if you want a permanent test endpoint.
+4. (Optional) **Run iperf3 server at boot** on Linux [web:213]
+
+   Create a systemd unit:
+
+   ```ini
+   [Unit]
+   Description=iperf3 server
+   After=network.target
+
+   [Service]
+   ExecStart=/usr/bin/iperf3 -s
+   Restart=always
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+
+   Then enable it:
+
+   ```bash
+   sudo systemctl enable --now iperf3
+   ```
 
 ---
 
-## Installation (testing net)
+## Setup: Testing net (client with quick_live_iperf)
 
-On the **testing net** host (the client that will run the script):
+On the **testing net** host (where you run the script):
 
-1. Install `iperf3` and dependencies if needed:
+1. **Install iperf3** (same commands as above for your OS). [web:172][web:211]
 
-   ```bash
-   sudo apt install iperf3
-   ```
+2. **Download the script**
 
-2. Download or copy `quick_live_iperf.sh` into a directory in your `$PATH` or any working directory:
+   Save `quick_live_iperf.sh` into your repo or a tools directory and make it executable:
 
    ```bash
    chmod +x quick_live_iperf.sh
    ```
+
+3. **Run tests**
+
+   ```bash
+   ./quick_live_iperf.sh
+   Enter target IP or hostname (target net): 10.0.0.45
+   Enter iperf3 port :
+   ```
+
+   - Enter the **LAN or public IP** of the iperf3 server.  
+   - Enter the port used by the server (or press Enter for default 5201).  
+   - The script will:
+     - Ping the target to check reachability.
+     - Run TCP up/down and UDP tests.
+     - Print compact summaries and a final table.
 
 ---
 
