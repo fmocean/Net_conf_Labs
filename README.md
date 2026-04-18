@@ -1,4 +1,4 @@
-# quick_live_iperf
+# IPERF3 Tester
 
 Small bash wrapper around `iperf3` for fast, **human‑readable** connectivity checks between a *testing net* and a *target net*.
 
