@@ -12,6 +12,9 @@ Right now there are three main lab areas, each in its own branch:
 
 - `BGP_LABS` – BGP-focused routing and policy labs  
   https://github.com/fmocean/Net_conf_Labs/tree/BGP_LABS
+  
+- `VMWARE_NET` – VMWare focused routing and switching labs 
+  https://github.com/fmocean/Net_conf_Labs/tree/vmware_net
 
 More lab branches and topics will be added as I build and test new scenarios.
 
